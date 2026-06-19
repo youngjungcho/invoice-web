@@ -7,11 +7,12 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginSchema = z.object({
   email: z.string().email("유효한 이메일을 입력하세요."),
@@ -47,59 +48,58 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
-      <Card className="w-full max-w-md border-zinc-800 bg-zinc-900">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md">
         <CardHeader className="relative">
           <Link
             href="/"
-            className="absolute right-0 top-0 text-zinc-500 hover:text-zinc-200 transition-colors"
+            className="absolute right-0 top-0 text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="h-5 w-5" />
           </Link>
-          <CardTitle className="text-zinc-50">로그인</CardTitle>
-          <CardDescription className="text-zinc-400">
-            이메일과 비밀번호로 로그인하세요
-          </CardDescription>
+          <CardTitle>로그인</CardTitle>
+          <CardDescription>이메일과 비밀번호로 로그인하세요</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-zinc-300">이메일</Label>
+              <Label htmlFor="email">이메일</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className="border-zinc-700 bg-zinc-800 text-zinc-50 placeholder:text-zinc-500"
+                autoComplete="email"
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-sm text-red-400">{errors.email.message}</p>
+                <p className="text-sm text-destructive">{errors.email.message}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-zinc-300">비밀번호</Label>
+              <Label htmlFor="password">비밀번호</Label>
               <Input
                 id="password"
                 type="password"
-                className="border-zinc-700 bg-zinc-800 text-zinc-50"
+                autoComplete="current-password"
                 {...register("password")}
               />
               {errors.password && (
-                <p className="text-sm text-red-400">{errors.password.message}</p>
+                <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
             </div>
-            {error && <p className="text-sm text-red-400">{error}</p>}
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-indigo-600 hover:bg-indigo-700"
-            >
+            <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? "로그인 중..." : "로그인"}
             </Button>
           </form>
-          <p className="mt-4 text-center text-sm text-zinc-500">
+          <p className="mt-4 text-center text-sm text-muted-foreground">
             계정이 없으신가요?{" "}
-            <Link href="/register" className="text-indigo-400 hover:underline">
+            <Link href="/register" className="text-primary hover:underline font-medium">
               회원가입
             </Link>
           </p>
