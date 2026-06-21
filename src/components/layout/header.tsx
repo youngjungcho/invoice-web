@@ -1,4 +1,4 @@
-import { auth, signOut } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -7,9 +7,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { User } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
+import { SignOutButton } from "@/components/layout/SignOutButton";
 
 export async function Header() {
   const session = await auth();
@@ -44,19 +45,8 @@ export async function Header() {
               프로필
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive focus:text-destructive">
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/login" });
-                }}
-                className="flex w-full items-center"
-              >
-                <button type="submit" className="flex w-full items-center">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  로그아웃
-                </button>
-              </form>
+            <DropdownMenuItem className="text-destructive focus:text-destructive p-0">
+              <SignOutButton />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

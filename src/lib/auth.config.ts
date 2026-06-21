@@ -10,7 +10,16 @@ export const authConfig: NextAuthConfig = {
       const isProtected =
         nextUrl.pathname.startsWith("/dashboard") ||
         nextUrl.pathname.startsWith("/settings")
-      if (isProtected && !isLoggedIn) return false
+      const isAuthPage =
+        nextUrl.pathname.startsWith("/login") ||
+        nextUrl.pathname.startsWith("/register")
+
+      if (isProtected && !isLoggedIn) {
+        return Response.redirect(new URL("/login", nextUrl))
+      }
+      if (isAuthPage && isLoggedIn) {
+        return Response.redirect(new URL("/dashboard", nextUrl))
+      }
       return true
     },
   },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ interface ProfileFormProps {
 export function ProfileForm({ name, email }: ProfileFormProps) {
   const [value, setValue] = useState(name);
   const [loading, setLoading] = useState(false);
+  const { update } = useSession();
 
   async function handleSave() {
     if (!value.trim()) {
@@ -30,6 +32,7 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
         body: JSON.stringify({ name: value }),
       });
       if (!res.ok) throw new Error();
+      await update({ name: value });
       toast.success("프로필이 저장되었습니다.");
     } catch {
       toast.error("저장에 실패했습니다. 다시 시도해주세요.");
