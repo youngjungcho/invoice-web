@@ -28,7 +28,7 @@ AUTH_URL="http://localhost:3000"
 
 ## 아키텍처
 
-**스택:** Next.js 16 App Router · React 19 · TypeScript · NextAuth v5 (JWT) · Prisma 7 + SQLite (better-sqlite3) · shadcn/ui · Tailwind CSS v4 · React Hook Form + Zod · Recharts · Sonner
+**스택:** Next.js 16 App Router · React 19 · TypeScript · NextAuth v5 (JWT) · Prisma 7 + SQLite (better-sqlite3) · shadcn/ui · Tailwind CSS v4 · React Hook Form + Zod v4 · Recharts · Sonner · next-themes · lucide-react
 
 ### 라우트 구조
 
@@ -38,25 +38,27 @@ src/app/
   (dashboard)/      # 보호된 페이지 — 사이드바 + 헤더 레이아웃
     dashboard/      # 통계 카드, 방문자 차트, 최근 사용자 테이블
     analytics/      # 주간 바차트, 트래픽 파이차트, 월간 매출 라인차트
-    components/     # shadcn/ui 컴포넌트 쇼케이스
-    settings/       # 프로필, 보안, 알림 탭
+    components/     # shadcn/ui 컴포넌트 쇼케이스 (ComponentShowcase 클라이언트 컴포넌트)
+    settings/       # 프로필, 보안, 알림 탭 (ProfileForm, SecurityCard, NotificationsCard)
   api/
     auth/
       register/     # POST — 회원가입
-      [...nextauth]/# NextAuth 핸들러
+      [...nextauth]/# NextAuth 핸들러 (GET, POST)
     user/
       profile/      # PATCH — 사용자 이름 업데이트 (Zod 유효성 검사, 세션 인증)
+  actions.ts        # 서버 액션 — signOutAction()
   page.tsx          # 랜딩 페이지
 ```
 
-미들웨어(`middleware.ts`)는 Edge에서 실행되며 `/dashboard/*`, `/settings/*`를 보호합니다. 이미 로그인된 경우 인증 페이지는 대시보드로 리다이렉트합니다.
+미들웨어(`middleware.ts`)는 Edge에서 실행되며 matcher: `/((?!api|_next/static|_next/image|favicon.ico).*)` 패턴으로 모든 라우트를 검사합니다. `/dashboard/*`, `/settings/*`는 인증 필수, 이미 로그인된 경우 `/login`·`/register`는 `/dashboard`로 리다이렉트합니다.
 
 ### 인증 흐름
 
-1. 회원가입: `POST /api/auth/register` → bcryptjs 해시(12 rounds) → Prisma `User` 생성
+1. 회원가입: `POST /api/auth/register` → Zod 유효성 검사 → bcryptjs 해시(12 rounds) → Prisma `User` 생성
 2. 로그인: NextAuth Credentials provider → Zod 유효성 검사 → DB 조회 → 비밀번호 비교 → JWT 발급
 3. 세션: 서버 컴포넌트에서는 `auth()`, 클라이언트 컴포넌트에서는 `useSession()` 사용
 4. 설정 분리: `src/lib/auth.ts` (전체 설정, Node.js) vs `src/lib/auth.config.ts` (미들웨어용, Edge)
+5. 로그아웃: `src/app/actions.ts`의 `signOutAction()` 서버 액션 사용
 
 ### 데이터베이스
 
@@ -68,31 +70,41 @@ Prisma 스키마: `prisma/schema.prisma`. 모델: `User`, `Account`, `Session`, 
 
 shadcn/ui 컴포넌트는 `src/components/ui/`에 위치. 새 컴포넌트 추가: `npx shadcn add <component>`. 경로 별칭 `@/*`는 `src/*`로 매핑됩니다.
 
-**레이아웃** (`src/components/layout/`): `Sidebar`, `Header`, `MobileSidebar`, `ThemeToggle`, `LandingNav`
+설치된 shadcn/ui 컴포넌트: `alert`, `alert-dialog`, `avatar`, `badge`, `button`, `card`, `dialog`, `dropdown-menu`, `form`, `input`, `label`, `progress`, `select`, `separator`, `sheet`, `skeleton`, `switch`, `table`, `tabs`, `textarea`, `tooltip`
+
+**레이아웃** (`src/components/layout/`): `Sidebar`, `Header`(서버 컴포넌트), `MobileSidebar`, `ThemeToggle`, `LandingNav`, `Footer`, `SignOutButton`
+
+**프로바이더** (`src/components/providers/`): `ThemeProvider`(next-themes 래퍼), `SessionProvider`(next-auth/react 래퍼)
 
 **공통 컴포넌트** (`src/components/common/`):
-- `PageHeader` — 페이지 제목 + 설명 + 우측 슬롯
-- `StatCard` — 통계 카드 (값 + 아이콘 + 변화율 배지)
-- `DataTable` — 제네릭 테이블 (컬럼 정의, 셀 렌더 함수 지원)
-- `EmptyState` — 빈 상태 안내
-- `OverviewChart` — Recharts 라인차트 (방문자 & 신규 가입 추이)
-- `AnalyticsCharts` — 주간 바차트 + 월별 매출 라인 + 트래픽 파이차트
+- `PageHeader` — 페이지 제목 + 설명 + 우측 슬롯 (`title`, `description?`, `children?`)
+- `StatCard` — 통계 카드 (`title`, `value`, `icon: LucideIcon`, `change?`, `changeType?: "positive"|"negative"|"neutral"`)
+- `DataTable<T>` — 제네릭 테이블 (`columns: Column<T>[]`, `data: T[]`, `emptyMessage?`)
+- `EmptyState` — 빈 상태 안내 (`icon?`, `title`, `description?`, `children?`)
+- `OverviewChart` — Recharts 라인차트 (방문자 & 신규 가입 추이, props 없음)
+- `AnalyticsCharts` — `WeeklyBarChart`, `RevenueLineChart`, `TrafficPieChart` (각각 props 없음)
 
 ### 커스텀 훅 (`src/hooks/`)
 
-| 훅 | 설명 |
-|----|------|
-| `useMediaQuery(bp)` | Tailwind 브레이크포인트 래퍼. `bp`: `sm`/`md`/`lg`/`xl`/`2xl`/`mobile`/`tablet`/`desktop`/`dark`/`reducedMotion` |
-| `useFetch(url)` | 경량 데이터 페칭. `{ data, loading, error }` 반환. AbortController로 메모리 누수 방지 |
-| `useDisclosure()` | 모달/드로어 상태 관리. `{ isOpen, open, close, toggle }` 반환 |
-| `useDebounce(value, delay?)` | 입력값 지연 처리 (기본 400ms). 검색 입력, API 호출 최적화용 |
-| `useLocalStorage(key, init)` | localStorage 상태 관리 (SSR 안전, 탭 동기화) |
-| `useIntersectionObserver` | 무한 스크롤, 지연 로딩용. 옵션: `threshold`, `rootMargin`, `freezeOnceVisible` |
-| `useCopyToClipboard()` | 클립보드 복사 + sonner toast 자동 알림 |
+모든 훅은 `src/hooks/index.ts`에서 re-export됩니다.
+
+| 훅 | 반환 타입 | 설명 |
+|----|----------|------|
+| `useMediaQuery(bp)` | `boolean` | Tailwind 브레이크포인트 래퍼. `bp`: `sm`/`md`/`lg`/`xl`/`2xl`/`mobile`/`tablet`/`desktop`/`dark`/`reducedMotion` |
+| `useFetch<T>(url \| null)` | `{ data: T\|null, loading: boolean, error: Error\|null }` | 경량 데이터 페칭. AbortController로 메모리 누수 방지 |
+| `useDisclosure(initialState?)` | `{ isOpen, open, close, toggle }` | 모달/드로어 상태 관리 |
+| `useDebounce<T>(value, delay?)` | `T` | 입력값 지연 처리 (기본 400ms) |
+| `useLocalStorage<T>(key, init)` | `[T, setter, remover]` | localStorage 상태 관리 (SSR 안전, 탭 동기화). usehooks-ts 기반 |
+| `useIntersectionObserver(options?)` | `{ ref, isIntersecting, entry }` | 무한 스크롤, 지연 로딩용. `threshold`, `rootMargin`, `freezeOnceVisible` 옵션 지원 |
+| `useCopyToClipboard()` | `{ copiedText: string\|null, copy: (text) => Promise<boolean> }` | 클립보드 복사 + sonner toast 자동 알림 |
+
+### 유틸리티
+
+- `src/lib/utils.ts` — `cn(...inputs)`: clsx + tailwind-merge 조합 유틸리티. 모든 className 병합에 사용할 것.
 
 ### 폼
 
-모든 폼은 React Hook Form + Zod 사용. 스키마는 각 페이지 파일 내에 정의됩니다. `@hookform/resolvers/zod`의 `zodResolver` 사용.
+모든 폼은 React Hook Form + Zod v4 사용. 스키마는 각 페이지 파일 내에 정의됩니다. `@hookform/resolvers/zod`의 `zodResolver` 사용.
 
 ### 알림
 
