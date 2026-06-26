@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, AlertCircle } from "lucide-react";
+import { AlertCircle, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,63 +48,130 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="relative">
-          <Link
-            href="/"
-            className="absolute right-0 top-0 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </Link>
-          <CardTitle>로그인</CardTitle>
-          <CardDescription>이메일과 비밀번호로 로그인하세요</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">이메일</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                {...register("email")}
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-background via-muted/30 to-background px-4 py-12">
+      {/* Background decoration */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
+      </div>
+
+      <div className="relative w-full max-w-sm">
+        {/* Logo / Brand */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-lg">
+            <Lock className="h-6 w-6 text-primary-foreground" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">다시 오신 것을 환영해요</h1>
+          <p className="mt-1 text-sm text-muted-foreground">계정에 로그인하세요</p>
+        </div>
+
+        <Card className="border-border/50 shadow-xl shadow-black/5">
+          <CardHeader className="pb-4 pt-6">
+            <CardTitle className="text-lg">로그인</CardTitle>
+            <CardDescription>이메일과 비밀번호를 입력하세요</CardDescription>
+          </CardHeader>
+          <CardContent className="pb-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {error && (
+                <Alert variant="destructive" className="border-destructive/50 bg-destructive/5">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-sm">{error}</AlertDescription>
+                </Alert>
               )}
+
+              {/* Email Field */}
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  이메일
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    className="pl-9 transition-shadow focus-visible:shadow-md"
+                    {...register("email")}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-xs text-destructive">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    비밀번호
+                  </Label>
+                </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    className="pl-9 transition-shadow focus-visible:shadow-md"
+                    {...register("password")}
+                  />
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-destructive">{errors.password.message}</p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-2 w-full gap-2 font-medium"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    로그인 중...
+                  </>
+                ) : (
+                  <>
+                    로그인
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border/60" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-card px-3 text-muted-foreground">계정이 없으신가요?</span>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">비밀번호</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                {...register("password")}
-              />
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
-            </div>
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? "로그인 중..." : "로그인"}
-            </Button>
-          </form>
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            계정이 없으신가요?{" "}
-            <Link href="/register" className="text-primary hover:underline font-medium">
-              회원가입
+
+            {/* Sign Up Link */}
+            <Link href="/register">
+              <Button
+                variant="outline"
+                className="w-full font-medium text-foreground hover:bg-muted/60"
+              >
+                회원가입
+              </Button>
             </Link>
-          </p>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          <Link href="/" className="hover:text-foreground transition-colors underline-offset-4 hover:underline">
+            홈으로 돌아가기
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
