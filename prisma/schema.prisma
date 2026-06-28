@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -52,4 +51,23 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model QuoteShare {
+  id           String    @id @default(cuid())
+  notionPageId String    @unique
+  slug         String    @unique
+  createdBy    String
+  createdAt    DateTime  @default(now())
+  revokedAt    DateTime?
+}
+
+model QuoteViewLog {
+  id        String   @id @default(cuid())
+  slug      String
+  ipHash    String
+  userAgent String
+  viewedAt  DateTime @default(now())
+
+  @@index([slug, viewedAt])
 }
