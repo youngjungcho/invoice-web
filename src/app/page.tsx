@@ -1,70 +1,39 @@
 import Link from "next/link";
-import { Zap, Shield, Database, ArrowRight, Check, BarChart2, Layers, RefreshCw } from "lucide-react";
+import { FileText, Share2, Download, Shield, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Footer } from "@/components/layout/footer";
 import { LandingNav } from "@/components/layout/LandingNav";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "견적서 — Notion 기반 견적서 공유 서비스",
+  description: "Notion에서 작성한 견적서를 한 번의 클릭으로 고객에게 공유하세요.",
+};
 
 const features = [
   {
-    icon: Zap,
-    title: "Next.js 16 App Router",
-    description: "Server Components, Streaming, Parallel Routes로 최고 성능의 앱을 만드세요.",
+    icon: FileText,
+    title: "Notion이 원천 데이터",
+    description:
+      "별도의 견적서 에디터 없이, 이미 익숙한 Notion DB에서 견적서를 작성하세요. 본 서비스는 데이터를 읽어 렌더링하는 역할만 합니다.",
+  },
+  {
+    icon: Share2,
+    title: "한 번의 클릭으로 공유",
+    description:
+      "견적서를 선택하고 '공유 링크 생성' 버튼을 누르면 고객 전용 URL이 생성됩니다. 고객은 로그인 없이 즉시 열람 가능합니다.",
+  },
+  {
+    icon: Download,
+    title: "브라우저에서 PDF 저장",
+    description:
+      "고객이 공유 페이지에서 'PDF 저장' 버튼을 클릭하면 브라우저 인쇄 다이얼로그로 PDF를 저장할 수 있습니다. 별도 서버 비용 없음.",
   },
   {
     icon: Shield,
-    title: "NextAuth v5 인증",
-    description: "JWT 기반 인증, 미들웨어 보호, Credentials 로그인이 바로 작동합니다.",
-  },
-  {
-    icon: Database,
-    title: "Prisma + SQLite",
-    description: "타입 안전한 ORM으로 즉시 개발 시작. 프로덕션엔 PostgreSQL로 전환하세요.",
-  },
-  {
-    icon: Layers,
-    title: "shadcn/ui 컴포넌트",
-    description: "복사-붙여넣기 방식의 접근성 높은 UI 컴포넌트로 디자인을 완성하세요.",
-  },
-  {
-    icon: BarChart2,
-    title: "Recharts 대시보드",
-    description: "반응형 차트와 통계 카드가 포함된 분석 대시보드가 준비되어 있습니다.",
-  },
-  {
-    icon: RefreshCw,
-    title: "다크/라이트 테마",
-    description: "next-themes로 시스템 설정을 따르거나 수동으로 테마를 전환하세요.",
-  },
-];
-
-const plans = [
-  {
-    name: "무료",
-    price: "0",
-    description: "개인 프로젝트와 학습용",
-    features: ["App Router 구조", "이메일 인증", "SQLite DB", "기본 대시보드"],
-    cta: "무료로 시작",
-    href: "/register",
-    highlighted: false,
-  },
-  {
-    name: "프로",
-    price: "29,000",
-    description: "팀과 프로덕션 서비스용",
-    features: ["무료 플랜 전체", "PostgreSQL 지원", "분석 대시보드", "우선 지원"],
-    cta: "프로 시작하기",
-    href: "/register",
-    highlighted: true,
-  },
-  {
-    name: "엔터프라이즈",
-    price: "문의",
-    description: "대규모 팀을 위한 맞춤 솔루션",
-    features: ["프로 플랜 전체", "전담 지원", "커스텀 계약", "SLA 보장"],
-    cta: "문의하기",
-    href: "/register",
-    highlighted: false,
+    title: "보안 공유",
+    description:
+      "126비트 엔트로피의 nanoid 슬러그로 추측 불가한 공유 링크를 생성합니다. 언제든 공유를 해제하면 링크는 즉시 무효화됩니다.",
   },
 ];
 
@@ -74,18 +43,19 @@ export default function LandingPage() {
       <LandingNav />
 
       {/* Hero */}
-      <section id="hero" className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
-        <Badge variant="secondary" className="mb-6">
-          ✨ Next.js 16 · NextAuth v5 · Prisma 7
-        </Badge>
+      <section className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          Notion API · NextAuth · Prisma + SQLite
+        </div>
         <h1 className="max-w-3xl text-5xl font-bold leading-tight tracking-tight">
-          더 빠르게 빌드하고,
+          Notion 견적서를
           <br />
-          <span className="text-primary/70">더 스마트하게 출시하세요.</span>
+          <span className="text-primary/80">고객과 바로 공유하세요.</span>
         </h1>
         <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-          Next.js 16, NextAuth, Prisma, shadcn/ui가 모두 설정된 스타터킷으로
-          비즈니스 로직에만 집중하세요.
+          Notion에서 작성한 견적서를 한 번의 클릭으로 고객 전용 URL로 공유하고,
+          고객은 로그인 없이 열람 및 PDF 저장을 할 수 있습니다.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link href="/register">
@@ -103,15 +73,15 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="scroll-mt-20 border-t border-border px-6 py-20">
+      <section className="border-t border-border px-6 py-20">
         <div className="mx-auto max-w-5xl">
           <h2 className="mb-4 text-center text-3xl font-bold tracking-tight">
-            모든 것이 준비되어 있습니다
+            간단한 워크플로우
           </h2>
           <p className="mb-12 text-center text-muted-foreground">
-            반복적인 설정 작업 없이 바로 핵심 기능 개발을 시작하세요.
+            복잡한 SaaS 대신, 이미 쓰고 있는 Notion에서 시작하세요.
           </p>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             {features.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
@@ -128,59 +98,41 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="scroll-mt-20 border-t border-border bg-muted/30 px-6 py-20">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="mb-4 text-center text-3xl font-bold tracking-tight">
-            심플한 요금제
-          </h2>
-          <p className="mb-12 text-center text-muted-foreground">
-            팀 규모와 필요에 맞는 플랜을 선택하세요.
-          </p>
-          <div className="grid gap-6 md:grid-cols-3">
-            {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative rounded-xl border p-6 ${
-                  plan.highlighted
-                    ? "border-primary bg-card shadow-lg ring-1 ring-primary/20"
-                    : "border-border bg-card"
-                }`}
-              >
-                {plan.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    인기
-                  </Badge>
-                )}
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold">{plan.name}</h3>
-                  <p className="text-sm text-muted-foreground">{plan.description}</p>
+      {/* 사용 흐름 */}
+      <section className="border-t border-border bg-muted/30 px-6 py-20">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="mb-12 text-center text-3xl font-bold tracking-tight">사용 방법</h2>
+          <div className="space-y-6">
+            {[
+              {
+                step: "1",
+                title: "Notion DB 설정",
+                desc: "Notion 워크스페이스에 견적서 DB를 만들고, 통합(Integration)을 연결하세요.",
+              },
+              {
+                step: "2",
+                title: "환경변수 입력",
+                desc: "NOTION_TOKEN과 NOTION_DATABASE_ID를 .env 파일에 입력하면 견적서 목록이 자동으로 불러와집니다.",
+              },
+              {
+                step: "3",
+                title: "공유 링크 생성",
+                desc: "대시보드에서 견적서를 선택하고 '공유 링크 생성' 버튼을 클릭하세요. URL이 클립보드에 복사됩니다.",
+              },
+              {
+                step: "4",
+                title: "고객 열람 & PDF 저장",
+                desc: "고객은 로그인 없이 링크에 접속해 견적서를 확인하고 PDF로 저장할 수 있습니다.",
+              },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="flex gap-5">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  {step}
+                </span>
+                <div>
+                  <h3 className="font-semibold">{title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
                 </div>
-                <div className="mb-6">
-                  <span className="text-3xl font-bold">
-                    {plan.price === "문의" ? "" : "₩"}
-                    {plan.price}
-                  </span>
-                  {plan.price !== "문의" && (
-                    <span className="text-sm text-muted-foreground">/월</span>
-                  )}
-                </div>
-                <ul className="mb-6 space-y-2">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 shrink-0 text-emerald-500" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href={plan.href}>
-                  <Button
-                    className="w-full"
-                    variant={plan.highlighted ? "default" : "outline"}
-                  >
-                    {plan.cta}
-                  </Button>
-                </Link>
               </div>
             ))}
           </div>
@@ -188,13 +140,11 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section id="cta" className="scroll-mt-20 border-t border-border px-6 py-20 text-center">
+      <section className="border-t border-border px-6 py-20 text-center">
         <div className="mx-auto max-w-xl">
-          <h2 className="text-3xl font-bold tracking-tight">
-            지금 바로 시작하세요
-          </h2>
+          <h2 className="text-3xl font-bold tracking-tight">지금 바로 시작하세요</h2>
           <p className="mt-4 text-muted-foreground">
-            5분 안에 풀스택 Next.js 앱을 실행하고 빌드를 시작하세요.
+            Notion 통합 설정 후 5분이면 첫 견적서를 고객과 공유할 수 있습니다.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link href="/register">

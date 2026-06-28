@@ -9,7 +9,8 @@ export const authConfig: NextAuthConfig = {
       const isLoggedIn = !!auth?.user
       const isProtected =
         nextUrl.pathname.startsWith("/dashboard") ||
-        nextUrl.pathname.startsWith("/settings")
+        nextUrl.pathname.startsWith("/settings") ||
+        nextUrl.pathname.startsWith("/quotes")
       const isAuthPage =
         nextUrl.pathname.startsWith("/login") ||
         nextUrl.pathname.startsWith("/register")

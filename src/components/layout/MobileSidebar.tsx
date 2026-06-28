@@ -3,15 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, LayoutDashboard, Settings, BarChart2, Layers } from "lucide-react";
+import { Menu, LayoutDashboard, Settings, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
-  { href: "/analytics", label: "분석", icon: BarChart2 },
-  { href: "/components", label: "컴포넌트", icon: Layers },
+  { href: "/dashboard/quotes", label: "견적서", icon: FileText },
   { href: "/settings", label: "설정", icon: Settings },
 ];
 
@@ -34,7 +33,7 @@ export function MobileSidebar() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="w-60 p-0">
           <SheetHeader className="px-6 py-5 border-b border-border">
-            <SheetTitle className="text-left">StarterKit</SheetTitle>
+            <SheetTitle className="text-left">견적서</SheetTitle>
           </SheetHeader>
           <nav className="flex-1 space-y-1 p-3 pt-4">
             {navItems.map(({ href, label, icon: Icon }) => (

@@ -6,8 +6,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Next.js Starter Kit",
-  description: "빠르게 시작하는 Next.js 스타터킷",
+  title: {
+    default: "견적서 — Notion 기반 견적서 공유 서비스",
+    template: "%s | 견적서",
+  },
+  description: "Notion에서 작성한 견적서를 한 번의 클릭으로 고객에게 공유하세요.",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({
