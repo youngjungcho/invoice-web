@@ -30,6 +30,16 @@
         "shadcn@latest",
         "mcp"
       ]
+    },
+    "shrimp-task-manager": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-shrimp-task-manager"
+      ],
+      "env": {
+        "DATA_DIR": "/Users/joyeongjung/workspace/courses/invoice-web/.shrimp"
+      }
     }
   }
 }
