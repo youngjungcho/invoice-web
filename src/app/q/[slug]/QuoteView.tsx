@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Printer, AlertTriangle } from "lucide-react";
-import type { QuoteData } from "@/lib/notion";
+import type { QuoteData, QuoteItemData } from "@/lib/notion";
 
 interface Props {
   quote: QuoteData;
@@ -108,6 +108,34 @@ export function QuoteView({ quote, isExpired }: Props) {
               <p className="font-semibold text-foreground">{quote.projectName ?? "-"}</p>
             </div>
           </div>
+
+          {/* 견적 항목 */}
+          {quote.items && quote.items.length > 0 && (
+            <div className="mb-8 rounded-lg border border-border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50">
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">항목명</th>
+                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">설명</th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">수량</th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">단가</th>
+                    <th className="px-4 py-3 text-right font-medium text-muted-foreground">금액</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {quote.items.map((item: QuoteItemData) => (
+                    <tr key={item.id} className="border-t border-border">
+                      <td className="px-4 py-3 font-medium">{item.name ?? "-"}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{item.description ?? "-"}</td>
+                      <td className="px-4 py-3 text-right">{item.quantity ?? "-"}</td>
+                      <td className="px-4 py-3 text-right">{formatKRW(item.unitPrice)}</td>
+                      <td className="px-4 py-3 text-right font-medium">{formatKRW(item.lineTotal)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/* 금액 요약 */}
           <div className="mb-8 rounded-lg border border-border overflow-hidden">

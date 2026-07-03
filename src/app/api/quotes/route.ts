@@ -1,19 +1,49 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { queryAll, parseQuotePage, withRateLimit } from "@/lib/notion";
+import { notion, parseQuotePage, withRateLimit } from "@/lib/notion";
+import type { PageObjectResponse, QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 
-export async function GET(): Promise<NextResponse> {
+const PAGE_SIZE = 20;
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
   }
 
+  const { searchParams } = request.nextUrl;
+  const cursor = searchParams.get("cursor") ?? undefined;
+  const status = searchParams.get("status") ?? undefined;
+
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!databaseId) {
+    return NextResponse.json({ error: "NOTION_DATABASE_ID가 설정되지 않았습니다." }, { status: 500 });
+  }
+
+  const filter: QueryDatabaseParameters["filter"] | undefined = status
+    ? { property: "status", status: { equals: status } }
+    : undefined;
+
   try {
-    const pages = await withRateLimit(() =>
-      queryAll(undefined, [{ timestamp: "created_time", direction: "descending" }])
+    const response = await withRateLimit(() =>
+      notion.databases.query({
+        database_id: databaseId,
+        filter,
+        sorts: [{ timestamp: "created_time", direction: "descending" }],
+        start_cursor: cursor,
+        page_size: PAGE_SIZE,
+      })
     );
-    const quotes = pages.map(parseQuotePage);
-    return NextResponse.json(quotes);
+
+    const quotes = response.results
+      .filter((p) => p.object === "page" && "properties" in p)
+      .map((p) => parseQuotePage(p as PageObjectResponse));
+
+    return NextResponse.json({
+      quotes,
+      nextCursor: response.has_more ? response.next_cursor : null,
+      hasMore: response.has_more,
+    });
   } catch (error) {
     console.error("[GET /api/quotes]", error);
     return NextResponse.json(

@@ -124,20 +124,109 @@ body {
 }
 
 @media print {
+  /* A4 용지 설정 — 상하 20mm, 좌우 15mm 여백 */
   @page {
-    size: A4;
-    margin: 15mm;
+    size: A4 portrait;
+    margin: 20mm 15mm;
   }
 
+  /* 기본 인쇄 스타일 리셋 */
   body {
     background: white !important;
     color: black !important;
     font-size: 11pt;
+    line-height: 1.5;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
+  /* 화면 전용 요소 숨김 */
   .print\:hidden {
     display: none !important;
+  }
+
+  /* 링크 URL 인쇄 방지 */
+  a[href]::after {
+    content: none !important;
+  }
+
+  /* 페이지 나누기 제어 — 테이블 행 중간에서 페이지 나누기 방지 */
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* 견적서 카드 레이아웃 — 인쇄 시 여백·그림자 제거 */
+  .print\:border-0 {
+    border: none !important;
+  }
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  .print\:rounded-none {
+    border-radius: 0 !important;
+  }
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+  .print\:px-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .print\:py-0 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* 테이블 스타일 — 인쇄 시 보더 유지 */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid #e5e7eb;
+    padding: 6pt 8pt;
+    font-size: 10pt;
+  }
+
+  thead {
+    background-color: #f9fafb !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* 금액 합계 행 — 배경색 유지 */
+  .bg-primary\/5 {
+    background-color: #f5f3ff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* 섹션 제목 (상단 바) — 배경 없이 텍스트만 */
+  .bg-muted\/50 {
+    background-color: #f9fafb !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* 구분선 */
+  hr,
+  [role="separator"] {
+    border-color: #e5e7eb !important;
+  }
+
+  /* 견적서 헤딩 크기 조정 */
+  h1 {
+    font-size: 20pt !important;
+  }
+
+  h2 {
+    font-size: 10pt !important;
+  }
+
+  /* 푸터 — 페이지 하단 고정 */
+  @page :last {
+    margin-bottom: 25mm;
   }
 }

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -25,7 +26,9 @@ export default function RootLayout({
         <ThemeProvider>
           <SessionProvider>
             <TooltipProvider>
-              {children}
+              <Suspense>
+                {children}
+              </Suspense>
               <Toaster richColors position="top-right" />
             </TooltipProvider>
           </SessionProvider>

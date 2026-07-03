@@ -13,7 +13,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Next.js Starter Kit. MIT License.
+            © 2026 Next.js Starter Kit. MIT License.
           </p>
           <nav className="flex items-center gap-6">
             {links.map(({ label, href }) => (

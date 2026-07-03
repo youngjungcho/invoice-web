@@ -1,5 +1,8 @@
+import { Suspense } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { HeaderSkeleton } from "@/components/layout/HeaderSkeleton";
+import { SidebarSkeleton } from "@/components/layout/SidebarSkeleton";
 
 export default function DashboardLayout({
   children,
@@ -8,9 +11,13 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex h-screen bg-background">
-      <Sidebar />
+      <Suspense fallback={<SidebarSkeleton />}>
+        <Sidebar />
+      </Suspense>
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Header />
+        <Suspense fallback={<HeaderSkeleton />}>
+          <Header />
+        </Suspense>
         <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
       </div>
     </div>

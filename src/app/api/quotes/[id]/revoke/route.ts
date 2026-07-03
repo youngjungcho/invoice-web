@@ -31,8 +31,8 @@ export async function POST(_req: Request, { params }: Params): Promise<NextRespo
       data: { revokedAt: new Date() },
     });
 
-    // 공개 페이지 캐시 즉시 무효화 (unstable_cache 태그 기반)
-    revalidateTag(`quote-${share.slug}`, "default");
+    // 공개 페이지 캐시 즉시 무효화
+    revalidateTag(`quote-${share.slug}`, { expire: 0 });
 
     return NextResponse.json({ success: true });
   } catch (error) {

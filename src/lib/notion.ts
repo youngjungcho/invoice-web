@@ -5,6 +5,7 @@ import type {
   QueryDatabaseResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { nanoid } from "nanoid";
+import type { Invoice, InvoiceItem } from "@/types/notion";
 
 // ---------------------------------------------------------------------------
 // 싱글톤 Notion 클라이언트
@@ -27,9 +28,12 @@ if (process.env.NODE_ENV !== "production") globalForNotion.notion = notion;
 // 타입 헬퍼 — Notion property 안전 추출
 // ---------------------------------------------------------------------------
 
-type NotionPage = PageObjectResponse;
-type NotionProperties = NotionPage["properties"];
-type NotionProperty = NotionProperties[string];
+/**
+ * PageObjectResponse.properties[string] 와 동일한 타입.
+ * @notionhq/client 내부 타입을 직접 참조하되, src/types/notion.ts 의
+ * NotionRawProperty 와는 별개로 SDK 원본 타입을 사용합니다.
+ */
+type NotionProperty = PageObjectResponse["properties"][string];
 
 export function getTitle(page: PageObjectResponse): string | null {
   const props = page.properties;
@@ -57,6 +61,16 @@ export function getDate(prop: NotionProperty): string | null {
   return prop.date?.start ?? null;
 }
 
+export function getSelect(prop: NotionProperty): string | null {
+  if (prop.type !== "select") return null;
+  return prop.select?.name ?? null;
+}
+
+export function getMultiSelect(prop: NotionProperty): string[] {
+  if (prop.type !== "multi_select") return [];
+  return prop.multi_select.map((o) => o.name);
+}
+
 export function getStatus(prop: NotionProperty): string | null {
   if (prop.type !== "status") return null;
   return prop.status?.name ?? null;
@@ -72,6 +86,38 @@ export function getEmail(prop: NotionProperty): string | null {
   return prop.email;
 }
 
+export function getPhoneNumber(prop: NotionProperty): string | null {
+  if (prop.type !== "phone_number") return null;
+  return prop.phone_number;
+}
+
+export function getUrl(prop: NotionProperty): string | null {
+  if (prop.type !== "url") return null;
+  return prop.url;
+}
+
+export function getRelationIds(prop: NotionProperty): string[] {
+  if (prop.type !== "relation") return [];
+  return prop.relation.map((r) => r.id);
+}
+
+export function getRollupNumber(prop: NotionProperty): number | null {
+  if (prop.type !== "rollup") return null;
+  const rollup = prop.rollup;
+  if (rollup.type === "number") return rollup.number;
+  return null;
+}
+
+export function getCreatedTime(prop: NotionProperty): string | null {
+  if (prop.type !== "created_time") return null;
+  return prop.created_time;
+}
+
+export function getLastEditedTime(prop: NotionProperty): string | null {
+  if (prop.type !== "last_edited_time") return null;
+  return prop.last_edited_time;
+}
+
 export function getFormula(prop: NotionProperty): number | string | boolean | null {
   if (prop.type !== "formula") return null;
   const formula = prop.formula;
@@ -82,51 +128,72 @@ export function getFormula(prop: NotionProperty): number | string | boolean | nu
 }
 
 // ---------------------------------------------------------------------------
-// 견적서 데이터 타입
+// 견적서 데이터 타입 — src/types/notion.ts 에서 re-export
 // ---------------------------------------------------------------------------
 
-export interface QuoteData {
-  id: string;
-  url: string;
-  quoteNumber: string | null;
-  projectName: string | null;
-  clientCompany: string | null;
-  clientContactName: string | null;
-  clientEmail: string | null;
-  issuedDate: string | null;
-  validUntil: string | null;
-  status: string | null;
-  subtotal: number | null;
-  vat: number | null;
-  total: number | null;
-  paymentTerms: string | null;
-  notes: string | null;
-  shareSlug: string | null;
-  isPublic: boolean | null;
-}
+export type { Invoice, InvoiceItem, QuoteData, QuoteItemData, QuoteStatus } from "@/types/notion";
 
-export function parseQuotePage(page: PageObjectResponse): QuoteData {
+// ---------------------------------------------------------------------------
+// Notion 페이지 파서
+// ---------------------------------------------------------------------------
+
+/**
+ * Notion Invoices DB 페이지를 정규화된 Invoice 객체로 변환합니다.
+ *
+ * Notion 프로퍼티 이름 매핑 (한국어):
+ *   "견적서 번호"  → quoteNumber    (title)
+ *   "클라이언트명" → clientCompany  (rich_text)
+ *   "발행일"      → issuedDate     (date)
+ *   "유효기간"    → validUntil     (date)
+ *   "상태"        → status         (status)
+ *   "총 금액"     → total          (number)
+ *   "항목"        → (relation — queryItemsByQuoteId 에서 사용)
+ *   "share_slug"  → shareSlug      (rich_text)
+ *   "is_public"   → isPublic       (checkbox)
+ */
+export function parseQuotePage(page: PageObjectResponse): Invoice {
   const props = page.properties;
   return {
     id: page.id,
     url: page.url,
     quoteNumber: getTitle(page),
-    projectName: props["project_name"] ? getRichText(props["project_name"]) : null,
-    clientCompany: props["client_company"] ? getRichText(props["client_company"]) : null,
-    clientContactName: props["client_contact_name"]
-      ? getRichText(props["client_contact_name"])
-      : null,
-    clientEmail: props["client_email"] ? getEmail(props["client_email"]) : null,
-    issuedDate: props["issued_date"] ? getDate(props["issued_date"]) : null,
-    validUntil: props["valid_until"] ? getDate(props["valid_until"]) : null,
-    status: props["status"] ? getStatus(props["status"]) : null,
-    subtotal: props["subtotal"] ? getNumber(props["subtotal"]) : null,
-    vat: props["vat"] ? getFormula(props["vat"]) as number | null : null,
-    total: props["total"] ? getFormula(props["total"]) as number | null : null,
-    paymentTerms: props["payment_terms"] ? getRichText(props["payment_terms"]) : null,
-    notes: props["notes"] ? getRichText(props["notes"]) : null,
+    projectName: null,
+    clientCompany: props["클라이언트명"] ? getRichText(props["클라이언트명"]) : null,
+    clientContactName: null,
+    clientEmail: null,
+    issuedDate: props["발행일"] ? getDate(props["발행일"]) : null,
+    validUntil: props["유효기간"] ? getDate(props["유효기간"]) : null,
+    status: props["상태"] ? getStatus(props["상태"]) : null,
+    subtotal: null,
+    vat: null,
+    total: props["총 금액"] ? getNumber(props["총 금액"]) : null,
+    paymentTerms: null,
+    notes: null,
     shareSlug: props["share_slug"] ? getRichText(props["share_slug"]) : null,
     isPublic: props["is_public"] ? getCheckbox(props["is_public"]) : null,
+  };
+}
+
+/**
+ * Notion Items DB 페이지를 정규화된 InvoiceItem 객체로 변환합니다.
+ *
+ * Notion 프로퍼티 이름 매핑:
+ *   title       → name        (title)
+ *   description → description (rich_text)
+ *   quantity    → quantity    (number)
+ *   unit_price  → unitPrice   (number)
+ *   line_total  → lineTotal   (formula → number)
+ *   quote       → (relation — queryItemsByQuoteId 필터에서 사용)
+ */
+export function parseQuoteItemPage(page: PageObjectResponse): InvoiceItem {
+  const props = page.properties;
+  return {
+    id: page.id,
+    name: getTitle(page),
+    description: props["description"] ? getRichText(props["description"]) : null,
+    quantity: props["quantity"] ? getNumber(props["quantity"]) : null,
+    unitPrice: props["unit_price"] ? getNumber(props["unit_price"]) : null,
+    lineTotal: props["line_total"] ? (getFormula(props["line_total"]) as number | null) : null,
   };
 }
 
@@ -134,15 +201,11 @@ export function parseQuotePage(page: PageObjectResponse): QuoteData {
 // 페이지네이션 헬퍼
 // ---------------------------------------------------------------------------
 
-export async function queryAll(
+async function queryAllFromDb(
+  databaseId: string,
   filter?: QueryDatabaseParameters["filter"],
   sorts?: QueryDatabaseParameters["sorts"]
 ): Promise<PageObjectResponse[]> {
-  const databaseId = process.env.NOTION_DATABASE_ID;
-  if (!databaseId) {
-    throw new Error("NOTION_DATABASE_ID 환경변수가 설정되지 않았습니다.");
-  }
-
   const results: PageObjectResponse[] = [];
   let cursor: string | undefined;
 
@@ -165,6 +228,26 @@ export async function queryAll(
   } while (cursor);
 
   return results;
+}
+
+export async function queryAll(
+  filter?: QueryDatabaseParameters["filter"],
+  sorts?: QueryDatabaseParameters["sorts"]
+): Promise<PageObjectResponse[]> {
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!databaseId) {
+    throw new Error("NOTION_DATABASE_ID 환경변수가 설정되지 않았습니다.");
+  }
+  return queryAllFromDb(databaseId, filter, sorts);
+}
+
+export async function queryItemsByQuoteId(quotePageId: string): Promise<PageObjectResponse[]> {
+  const databaseId = process.env.NOTION_ITEM_DATABASE_ID;
+  if (!databaseId) return [];
+  return queryAllFromDb(databaseId, {
+    property: "quote",
+    relation: { contains: quotePageId },
+  });
 }
 
 // ---------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { FileText, Send, Eye, Clock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,22 +19,42 @@ const stats = [
   { title: "만료 예정", value: "-", icon: Clock },
 ];
 
-export default async function DashboardPage() {
+async function DashboardGreeting() {
   const session = await auth();
+  return (
+    <PageHeader
+      title="대시보드"
+      description={`안녕하세요, ${session?.user?.name ?? "사용자"}님! Notion에서 견적서를 관리하고 고객과 공유하세요.`}
+    >
+      <Link href="/dashboard/quotes">
+        <Button>
+          <FileText className="mr-2 h-4 w-4" />
+          견적서 목록
+        </Button>
+      </Link>
+    </PageHeader>
+  );
+}
 
+function DashboardGreetingSkeleton() {
+  return (
+    <PageHeader title="대시보드" description="로딩 중...">
+      <Link href="/dashboard/quotes">
+        <Button>
+          <FileText className="mr-2 h-4 w-4" />
+          견적서 목록
+        </Button>
+      </Link>
+    </PageHeader>
+  );
+}
+
+export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="대시보드"
-        description={`안녕하세요, ${session?.user?.name ?? "사용자"}님! Notion에서 견적서를 관리하고 고객과 공유하세요.`}
-      >
-        <Link href="/dashboard/quotes">
-          <Button>
-            <FileText className="mr-2 h-4 w-4" />
-            견적서 목록
-          </Button>
-        </Link>
-      </PageHeader>
+      <Suspense fallback={<DashboardGreetingSkeleton />}>
+        <DashboardGreeting />
+      </Suspense>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (

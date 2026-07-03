@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
 import { findBySlug, parseQuotePage, withRateLimit } from "@/lib/notion";
-import { unstable_cache } from "next/cache";
+import { cacheTag } from "next/cache";
 
 interface Params {
   params: Promise<{ slug: string }>;
 }
 
-const getCachedQuote = unstable_cache(
-  async (slug: string) => {
-    const page = await withRateLimit(() => findBySlug(slug));
-    if (!page) return null;
-    return parseQuotePage(page);
-  },
-  ["quote-by-slug"],
-  { revalidate: 60 } // 60초 캐시
-);
+async function getCachedQuote(slug: string) {
+  "use cache";
+  cacheTag(`quote-${slug}`);
+
+  const page = await withRateLimit(() => findBySlug(slug));
+  if (!page) return null;
+  return parseQuotePage(page);
+}
 
 export async function GET(_req: Request, { params }: Params): Promise<NextResponse> {
   const { slug } = await params;
