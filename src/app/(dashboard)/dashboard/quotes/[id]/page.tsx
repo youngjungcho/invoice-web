@@ -136,21 +136,21 @@ function QuoteDetailView({ quote, userId, viewCount }: { quote: QuoteData; userI
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border bg-muted/50">
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">항목명</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">설명</th>
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">수량</th>
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">단가</th>
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">금액</th>
+                        <th className="px-5 py-4 text-left font-semibold text-muted-foreground">항목명</th>
+                        <th className="px-5 py-4 text-left font-semibold text-muted-foreground">설명</th>
+                        <th className="px-5 py-4 text-right font-semibold text-muted-foreground">수량</th>
+                        <th className="px-5 py-4 text-right font-semibold text-muted-foreground">단가</th>
+                        <th className="px-5 py-4 text-right font-semibold text-muted-foreground">금액</th>
                       </tr>
                     </thead>
                     <tbody>
                       {quote.items.map((item) => (
-                        <tr key={item.id} className="border-b border-border last:border-0">
-                          <td className="px-4 py-3 font-medium">{item.name ?? "-"}</td>
-                          <td className="px-4 py-3 text-muted-foreground">{item.description ?? "-"}</td>
-                          <td className="px-4 py-3 text-right">{item.quantity ?? "-"}</td>
-                          <td className="px-4 py-3 text-right">{formatKRW(item.unitPrice)}</td>
-                          <td className="px-4 py-3 text-right font-medium">{formatKRW(item.lineTotal)}</td>
+                        <tr key={item.id} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
+                          <td className="px-5 py-4 font-medium">{item.name ?? "-"}</td>
+                          <td className="px-5 py-4 text-muted-foreground">{item.description ?? "-"}</td>
+                          <td className="px-5 py-4 text-right tabular-nums">{item.quantity ?? "-"}</td>
+                          <td className="px-5 py-4 text-right tabular-nums">{formatKRW(item.unitPrice)}</td>
+                          <td className="px-5 py-4 text-right font-semibold tabular-nums">{formatKRW(item.lineTotal)}</td>
                         </tr>
                       ))}
                     </tbody>
