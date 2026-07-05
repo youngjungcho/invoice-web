@@ -217,7 +217,7 @@ export function QuotesTable() {
       </CardHeader>
       <CardContent className="p-0">
         {/* 필터 결과가 없을 때 인라인 안내 */}
-        {!loading && quotes.length === 0 && statusFilter !== "all" && (
+        {!loading && quotes.length === 0 && statusFilter !== "전체" && (
           <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
             <Filter className="h-8 w-8 text-muted-foreground/40" />
             <p className="text-sm font-medium text-muted-foreground">

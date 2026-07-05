@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCopyToClipboard } from "@/hooks";
-import { Link2, Link2Off, Copy, ExternalLink } from "lucide-react";
+import { Link2, Link2Off, Copy, ExternalLink, FileDown } from "lucide-react";
 
 interface Props {
   quoteId: string;
@@ -139,6 +139,23 @@ export function SharePanel({ quoteId, slug: initialSlug, isPublic: initialIsPubl
               </Button>
             </>
           )}
+        </div>
+
+        <div className="pt-2 border-t border-border">
+          <Button
+            className="w-full"
+            variant="outline"
+            onClick={() => {
+              if (shareUrl && isPublic) {
+                window.open(shareUrl + "?print=1", "_blank");
+              } else {
+                window.print();
+              }
+            }}
+          >
+            <FileDown className="mr-2 h-4 w-4" />
+            PDF 다운로드
+          </Button>
         </div>
 
         <p className="text-xs text-muted-foreground">

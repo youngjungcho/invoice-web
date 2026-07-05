@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/common/StatCard";
 import { SharePanel } from "./SharePanel";
-import { Eye } from "lucide-react";
+import { Eye, FileText } from "lucide-react";
 import type { Metadata } from "next";
 import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import type { QuoteData } from "@/lib/notion";
@@ -126,12 +126,12 @@ function QuoteDetailView({ quote, userId, viewCount }: { quote: QuoteData; userI
             </CardContent>
           </Card>
 
-          {quote.items && quote.items.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>견적 항목</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
+          <Card>
+            <CardHeader>
+              <CardTitle>견적 항목</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {quote.items && quote.items.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -156,9 +156,14 @@ function QuoteDetailView({ quote, userId, viewCount }: { quote: QuoteData; userI
                     </tbody>
                   </table>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
+                  <FileText className="h-8 w-8 opacity-40" />
+                  <p className="text-sm">Notion에 등록된 견적 항목이 없습니다.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>

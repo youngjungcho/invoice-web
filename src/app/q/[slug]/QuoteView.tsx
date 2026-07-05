@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -9,6 +10,7 @@ import type { QuoteData, QuoteItemData } from "@/lib/notion";
 interface Props {
   quote: QuoteData;
   isExpired: boolean;
+  autoPrint?: boolean;
 }
 
 function formatKRW(value: number | null): string {
@@ -25,7 +27,14 @@ function formatDate(dateStr: string | null): string {
   });
 }
 
-export function QuoteView({ quote, isExpired }: Props) {
+export function QuoteView({ quote, isExpired, autoPrint }: Props) {
+  useEffect(() => {
+    if (autoPrint) {
+      const timer = setTimeout(() => window.print(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoPrint]);
+
   function handlePrint() {
     window.print();
   }

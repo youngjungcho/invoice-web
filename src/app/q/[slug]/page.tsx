@@ -17,6 +17,7 @@ import type { QuoteData } from "@/lib/notion";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ print?: string }>;
 }
 
 const SALT = process.env.IP_HASH_SALT ?? "default-salt-change-in-production";
@@ -73,8 +74,9 @@ async function ViewLogger({ slug }: { slug: string }) {
   return null;
 }
 
-export default async function PublicQuotePage({ params }: Props) {
+export default async function PublicQuotePage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { print } = await searchParams;
 
   const quote = await getCachedQuote(slug);
 
@@ -92,7 +94,7 @@ export default async function PublicQuotePage({ params }: Props) {
       <Suspense fallback={null}>
         <ViewLogger slug={slug} />
       </Suspense>
-      <QuoteView quote={quote} isExpired={isExpired} />
+      <QuoteView quote={quote} isExpired={isExpired} autoPrint={print === "1"} />
     </>
   );
 }
