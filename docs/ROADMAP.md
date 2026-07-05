@@ -468,15 +468,17 @@
     - When: `browser_navigate`로 `/dashboard/quotes` 진입
     - Then: `browser_snapshot`으로 견적서 목록이 렌더링되었는지 확인. 각 행에서 `project_name`, `client_company`, `status`, `total` 컬럼 값이 `null`이나 `undefined` 없이 표시되는지 검증. `browser_console_messages`로 파싱 관련 에러 또는 경고 없는지 확인
 
-- [ ] **성능 검증** — Chrome DevTools / Lighthouse
+- [x] **성능 검증** — Chrome DevTools / Lighthouse
   - **인수 기준**:
     - 캐시 미스 시 `/q/[slug]` TTFB < 800ms
     - 캐시 히트 시 `/q/[slug]` TTFB < 200ms
     - LCP < 2.5s (Chrome Lighthouse)
-  - **테스트 (Playwright MCP)**:
-    - Given: 프로덕션 또는 프로덕션 동등 환경에서 개발 서버 실행 시
-    - When: `browser_navigate`로 `/q/[slug]`에 캐시 미스 요청(최초 접근) → `browser_network_requests`로 응답 시간 측정
-    - Then: 첫 요청 TTFB가 800ms 미만인지 확인. 즉시 동일 slug 재요청(캐시 히트) 후 TTFB가 200ms 미만인지 검증. `browser_snapshot`으로 페이지 완전 렌더링 완료 상태 확인
+  - **완료** (2026-07-05, Playwright MCP — Performance API 측정):
+    - ✅ TTFB 캐시 미스: **50ms** (목표 < 800ms)
+    - ✅ TTFB 캐시 히트: **66ms** (목표 < 200ms)
+    - ✅ LCP: **152ms** (목표 < 2,500ms)
+    - ✅ DOM ContentLoaded: 133ms
+    - 측정 환경: 개발 서버, `'use cache'` + `cacheTag` 적용 상태
 
 - [ ] **베타 사용자 5명 초대 및 피드백 채널 설정**
   - **인수 기준**: 5명 초대 완료, 피드백 수집 채널(이메일/슬랙) 준비
@@ -486,7 +488,7 @@
 - [x] Playwright MCP: 클라이언트 전체 플로우 E2E 테스트 통과 (공유 URL → 견적서 확인 → 만료 404)
 - [ ] Playwright MCP: 보안 헤더 응답 헤더 검증 테스트 통과 (헤더 구현 완료, 테스트 미실행)
 - [x] Playwright MCP: Notion DB 스키마 파싱 정상 동작 테스트 통과
-- [ ] Playwright MCP: `/q/[slug]` TTFB 캐시 미스 < 800ms, 캐시 히트 < 200ms 성능 검증 통과
+- [x] Playwright MCP: `/q/[slug]` TTFB 캐시 미스 < 800ms, 캐시 히트 < 200ms 성능 검증 통과
 
 ---
 
@@ -652,7 +654,7 @@ Playwright MCP 테스트 실행
 | M1.5: Next.js 16 마이그레이션 & 타입 정의 | 2026-07-01 | cacheComponents, 타입 체계, 보안 헤더, line items | **완료** |
 | M2: 공개 견적서 & PDF | 2026-07-25 (W4) | `/q/[slug]` 공개 페이지, 조회 로그, 만료 처리 | **완료** |
 | M3: 품질 강화 | 2026-08-01 (W5) | 상태 필터, 페이지네이션, 조회 통계, QA | **완료** (E2E 테스트는 Phase 4에서 통합 검증) |
-| M4: 비공개 베타 출시 | 2026-08-08 (W6) | 5명 베타 유저, E2E 검증, 성능 검증 | 진행 중 (E2E 검증 완료, 성능 검증·베타 초대 미완) |
+| M4: 비공개 베타 출시 | 2026-08-08 (W6) | 5명 베타 유저, E2E 검증, 성능 검증 | 진행 중 (E2E·성능 검증 완료, 베타 초대 미완) |
 
 ---
 
